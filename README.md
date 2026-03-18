@@ -31,9 +31,10 @@ It was the fastest way to test bulk data processing.
 
 Also I used Claude for small routine subtasks at the beginning of this effort, like CSV parsing, but then simplified and changed it anyway.  There might be some AI-looking comments still around.  For program logic I didn't use AI at all because I wanted to use **Rust type state** pattern and it was just easier and more fun to do it myself.  I did a decent job keeping it well organized, small, and readable, but suspect that my approach to transaction state transitions could be further simplified.
 
-NOTE: This processor is single-threaded for simplicity.  In production I would:
+NOTE: This processor is single-threaded for simplicity. 
 
-* at the very least shard the clients to be able to paralellize this entire effort to multiple tx_processors.  
+In production I would at the very least:
+* shard the clients to be able to paralellize this entire effort to multiple tx_processors.  
 * use a persistent store and a cache for transactions and accounts  
 * obviously use log rather than `println!` or `eprintln!`
 
