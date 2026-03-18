@@ -47,7 +47,7 @@ impl DisputeTransaction for Transaction<Deposit> {
 
 impl ResolveTransaction for Transaction<Dispute> {
     fn resolve(&self, account: &mut Account) -> Result<Transaction<Resolve>> {
-        account.hold(self.amount)?;
+        account.resolve(self.amount)?;
         Ok(Transaction {
             client_id: self.client_id,
             tx_id: self.tx_id,

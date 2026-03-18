@@ -33,7 +33,7 @@ impl TxProcessor {
         Ok(account.clone())
     }
 
-    /// Withdrawal: create new transaction, but fail if account doesn't exist or has insufficient funds
+    /// Withdrawal: create new transaction, but fail if account doesn't exist or has insufficient available funds
     pub fn withdrawal(&mut self, client_id: u16, tx_id: u32, amount: f64) -> Result<Account> {
         if self.transactions.contains_key(&tx_id) {
             return Err(anyhow!("Transaction already exists!"));
@@ -52,6 +52,7 @@ impl TxProcessor {
         Ok(account.clone())
     }
 
+    /// Dispute existing "deposit" transaction if corresponding account is not locked
     pub fn dispute(&mut self, client_id: u16, tx_id: u32) -> Result<Account> {
         let account = self
             .clients
@@ -81,6 +82,7 @@ impl TxProcessor {
         Ok(account.clone())
     }
 
+    /// Resolve existing "dispute" transaction if corresponding account is not locked
     pub fn resolve(&mut self, client_id: u16, tx_id: u32) -> Result<Account> {
         let account = self
             .clients
@@ -110,6 +112,8 @@ impl TxProcessor {
         Ok(account.clone())
     }
 
+    /// Chargeback existing "dispute" transaction if corresponding account is not locked
+    /// This will lock the account for good
     pub fn chargeback(&mut self, client_id: u16, tx_id: u32) -> Result<Account> {
         let account = self
             .clients

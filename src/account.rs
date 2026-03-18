@@ -67,10 +67,6 @@ impl Account {
         if self.locked {
             return Err(anyhow::anyhow!("Account is locked"));
         }
-        let amount = round_to_4(amount);
-        if self.available < amount {
-            return Err(anyhow::anyhow!("Insufficient funds to be held!"));
-        }
         self.available -= amount;
         self.held += amount;
         Ok(())
@@ -80,11 +76,7 @@ impl Account {
         if self.locked {
             return Err(anyhow::anyhow!("Account is locked!"));
         }
-        let amount = round_to_4(amount);
 
-        if self.held < amount {
-            return Err(anyhow::anyhow!("Insufficient funds held to be resolved!"));
-        }
         self.held -= amount;
         self.available += amount;
         Ok(())
@@ -94,13 +86,7 @@ impl Account {
         if self.locked {
             return Err(anyhow::anyhow!("Account is already locked!"));
         }
-        let amount = round_to_4(amount);
-
-        if self.held < amount {
-            return Err(anyhow::anyhow!(
-                "Insufficient funds held to be charged back!"
-            ));
-        }
+    
         self.held -= amount;
         self.available -= amount;
         self.locked = true;
