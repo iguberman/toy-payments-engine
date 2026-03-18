@@ -86,7 +86,7 @@ impl Account {
         if self.locked {
             return Err(anyhow::anyhow!("Account is already locked!"));
         }
-    
+
         self.held -= amount;
         self.available -= amount;
         self.locked = true;
