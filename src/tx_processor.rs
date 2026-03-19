@@ -54,22 +54,21 @@ impl TxProcessor {
             .transactions
             .get_mut(&tx_id)
             .ok_or_else(|| anyhow!("Transaction not found"))?;
+        if transaction.client_id != client_id {
+            return Err(anyhow!("Client_id mismatch!"));
+        }
         match &transaction.state {
             TransactionType::Deposit(deposit_state) => {
-                if transaction.client_id != client_id {
-                    Err(anyhow!("Client_id mismatch!"))
-                } else {
-                    let account = self
-                        .clients
-                        .get_mut(&client_id)
-                        .ok_or(anyhow!("Client account not found: {}", client_id))?;
-                    match deposit_state.dispute(transaction.amount, account) {
-                        Ok(dispute_state) => {
-                            transaction.state = TransactionType::Dispute(dispute_state);
-                            Ok(account.clone())
-                        }
-                        Err(e) => Err(e),
+                let account = self
+                    .clients
+                    .get_mut(&client_id)
+                    .ok_or(anyhow!("Client account not found: {}", client_id))?;
+                match deposit_state.dispute(transaction.amount, account) {
+                    Ok(dispute_state) => {
+                        transaction.state = TransactionType::Dispute(dispute_state);
+                        Ok(account.clone())
                     }
+                    Err(e) => Err(e),
                 }
             }
             _ => Err(anyhow!(
@@ -84,22 +83,21 @@ impl TxProcessor {
             .transactions
             .get_mut(&tx_id)
             .ok_or_else(|| anyhow!("Transaction not found"))?;
+        if transaction.client_id != client_id {
+            return Err(anyhow!("Client_id mismatch!"));
+        }
         match &transaction.state {
             TransactionType::Dispute(disputed_state) => {
-                if transaction.client_id != client_id {
-                    Err(anyhow!("Client_id mismatch!"))
-                } else {
-                    let account = self
-                        .clients
-                        .get_mut(&client_id)
-                        .ok_or(anyhow!("Client account not found: {}", client_id))?;
-                    match disputed_state.resolve(transaction.amount, account) {
-                        Ok(resolved_state) => {
-                            transaction.state = TransactionType::Resolve(resolved_state);
-                            Ok(account.clone())
-                        }
-                        Err(e) => Err(e),
+                let account = self
+                    .clients
+                    .get_mut(&client_id)
+                    .ok_or(anyhow!("Client account not found: {}", client_id))?;
+                match disputed_state.resolve(transaction.amount, account) {
+                    Ok(resolved_state) => {
+                        transaction.state = TransactionType::Resolve(resolved_state);
+                        Ok(account.clone())
                     }
+                    Err(e) => Err(e),
                 }
             }
             _ => Err(anyhow!(
@@ -115,22 +113,21 @@ impl TxProcessor {
             .transactions
             .get_mut(&tx_id)
             .ok_or_else(|| anyhow!("Transaction not found"))?;
+        if transaction.client_id != client_id {
+            return Err(anyhow!("Client_id mismatch!"));
+        }
         match &transaction.state {
             TransactionType::Dispute(disputed_state) => {
-                if transaction.client_id != client_id {
-                    Err(anyhow!("Client_id mismatch!"))
-                } else {
-                    let account = self
-                        .clients
-                        .get_mut(&client_id)
-                        .ok_or(anyhow!("Client account not found: {}", client_id))?;
-                    match disputed_state.chargeback(transaction.amount, account) {
-                        Ok(chargeback_state) => {
-                            transaction.state = TransactionType::Chargeback(chargeback_state);
-                            Ok(account.clone())
-                        }
-                        Err(e) => Err(e),
+                let account = self
+                    .clients
+                    .get_mut(&client_id)
+                    .ok_or(anyhow!("Client account not found: {}", client_id))?;
+                match disputed_state.chargeback(transaction.amount, account) {
+                    Ok(chargeback_state) => {
+                        transaction.state = TransactionType::Chargeback(chargeback_state);
+                        Ok(account.clone())
                     }
+                    Err(e) => Err(e),
                 }
             }
             _ => Err(anyhow!(
