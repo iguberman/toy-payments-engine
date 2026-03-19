@@ -28,7 +28,7 @@ impl TxProcessor {
         #[allow(clippy::unwrap_or_default)]
         let account = self.clients.entry(client_id).or_insert(Account::default());
         let transaction_state =
-            TransactionState::Deposit(Transaction::new_deposit(client_id, tx_id, amount, account)?);
+            TransactionState::Deposit(Transaction::new_deposit(client_id, amount, account)?);
         self.transactions.insert(tx_id, transaction_state);
         Ok(account.clone())
     }
@@ -46,7 +46,7 @@ impl TxProcessor {
             .get_mut(&client_id)
             .ok_or_else(|| anyhow!("Can not withdraw from non-existing account!"))?;
         let transaction_state = TransactionState::Withdrawal(Transaction::new_withdrawal(
-            client_id, tx_id, amount, account,
+            client_id, amount, account,
         )?);
         self.transactions.insert(tx_id, transaction_state);
         Ok(account.clone())

@@ -38,7 +38,6 @@ impl DisputeTransaction for Transaction<Deposit> {
         account.hold(self.amount)?;
         Ok(Transaction {
             client_id: self.client_id,
-            tx_id: self.tx_id,
             amount: self.amount,
             _state: PhantomData,
         })
@@ -50,7 +49,6 @@ impl ResolveTransaction for Transaction<Dispute> {
         account.resolve(self.amount)?;
         Ok(Transaction {
             client_id: self.client_id,
-            tx_id: self.tx_id,
             amount: self.amount,
             _state: PhantomData,
         })
@@ -62,7 +60,6 @@ impl ChargebackTransaction for Transaction<Dispute> {
         account.chargeback(self.amount)?;
         Ok(Transaction {
             client_id: self.client_id,
-            tx_id: self.tx_id,
             amount: self.amount,
             _state: PhantomData,
         })
@@ -71,7 +68,6 @@ impl ChargebackTransaction for Transaction<Dispute> {
 
 pub struct Transaction<State> {
     pub client_id: u16,
-    pub tx_id: u32,
     pub amount: f64,
     _state: PhantomData<State>,
 }
@@ -83,14 +79,12 @@ impl<State> Transaction<State> {}
 impl Transaction<Withdrawal> {
     pub fn new_withdrawal(
         client_id: u16,
-        tx_id: u32,
         amount: f64,
         account: &mut Account,
     ) -> Result<Transaction<Withdrawal>> {
         account.withdraw(amount)?;
         Ok(Self {
             client_id,
-            tx_id,
             amount,
             _state: PhantomData,
         })
@@ -100,14 +94,12 @@ impl Transaction<Withdrawal> {
 impl Transaction<Deposit> {
     pub fn new_deposit(
         client_id: u16,
-        tx_id: u32,
         amount: f64,
         account: &mut Account,
     ) -> Result<Transaction<Deposit>> {
         account.deposit(amount)?;
         Ok(Self {
             client_id,
-            tx_id,
             amount,
             _state: PhantomData,
         })
