@@ -62,8 +62,7 @@ impl TxProcessor {
             TransactionState::Deposit(deposit_transaction) => {
                 if deposit_transaction.client_id != client_id {
                     Err(anyhow!("Client_id mismatch!"))
-                }
-                else {
+                } else {
                     let account = self
                         .clients
                         .get_mut(&client_id)
@@ -72,16 +71,14 @@ impl TxProcessor {
                         Ok(disputed_transaction) => {
                             *transaction_state = TransactionState::Dispute(disputed_transaction);
                             Ok(account.clone())
-                        },
-                        Err(e) => return Err(e),
+                        }
+                        Err(e) => Err(e),
                     }
                 }
-            },
-            _ => {
-                return Err(anyhow!(
-                    "Transaction is not a deposit and can not be disputed"
-                ))
             }
+            _ => Err(anyhow!(
+                "Transaction is not a deposit and can not be disputed"
+            )),
         }
     }
 
@@ -95,8 +92,7 @@ impl TxProcessor {
             TransactionState::Dispute(disputed_transaction) => {
                 if disputed_transaction.client_id != client_id {
                     Err(anyhow!("Client_id mismatch!"))
-                }
-                else {
+                } else {
                     let account = self
                         .clients
                         .get_mut(&client_id)
@@ -105,16 +101,14 @@ impl TxProcessor {
                         Ok(resolved_transaction) => {
                             *transaction_state = TransactionState::Resolve(resolved_transaction);
                             Ok(account.clone())
-                        },
-                        Err(e) => return Err(e),
+                        }
+                        Err(e) => Err(e),
                     }
                 }
-            },
-            _ => {
-                return Err(anyhow!(
-                    "Transaction is not disputed and can not be resolved"
-                ))
             }
+            _ => Err(anyhow!(
+                "Transaction is not disputed and can not be resolved"
+            )),
         }
     }
 
@@ -129,26 +123,24 @@ impl TxProcessor {
             TransactionState::Dispute(disputed_transaction) => {
                 if disputed_transaction.client_id != client_id {
                     Err(anyhow!("Client_id mismatch!"))
-                }
-                else {
+                } else {
                     let account = self
                         .clients
                         .get_mut(&client_id)
                         .ok_or(anyhow!("Client account not found: {}", client_id))?;
                     match disputed_transaction.chargeback(account) {
                         Ok(chargeback_transaction) => {
-                            *transaction_state = TransactionState::Chargeback(chargeback_transaction);
+                            *transaction_state =
+                                TransactionState::Chargeback(chargeback_transaction);
                             Ok(account.clone())
                         }
-                        Err(e) => return Err(e),
+                        Err(e) => Err(e),
                     }
                 }
             }
-            _ => {
-                return Err(anyhow!(
-                    "Transaction is not disputed and can not be charged back"
-                ))
-            }
+            _ => Err(anyhow!(
+                "Transaction is not disputed and can not be charged back"
+            )),
         }
     }
 
