@@ -13,103 +13,87 @@ pub struct Chargeback;
 // hence allow unused here
 #[allow(unused)]
 // For keeping different transaction types in a collection
-pub enum TransactionState {
-    Withdrawal(Transaction<Withdrawal>),
-    Deposit(Transaction<Deposit>),
-    Dispute(Transaction<Dispute>),
-    Resolve(Transaction<Resolve>),
-    Chargeback(Transaction<Chargeback>),
+pub enum TransactionType {
+    Withdrawal(TransactionState<Withdrawal>),
+    Deposit(TransactionState<Deposit>),
+    Dispute(TransactionState<Dispute>),
+    Resolve(TransactionState<Resolve>),
+    Chargeback(TransactionState<Chargeback>),
 }
 
-pub trait DisputeTransaction {
-    fn dispute(&self, account: &mut Account) -> Result<Transaction<Dispute>>;
-}
-
-pub trait ResolveTransaction {
-    fn resolve(&self, account: &mut Account) -> Result<Transaction<Resolve>>;
-}
-
-pub trait ChargebackTransaction {
-    fn chargeback(&self, account: &mut Account) -> Result<Transaction<Chargeback>>;
-}
-
-impl DisputeTransaction for Transaction<Deposit> {
-    fn dispute(&self, account: &mut Account) -> Result<Transaction<Dispute>> {
-        account.hold(self.amount)?;
-        Ok(Transaction {
-            client_id: self.client_id,
-            tx_id: self.tx_id,
-            amount: self.amount,
-            _state: PhantomData,
-        })
-    }
-}
-
-impl ResolveTransaction for Transaction<Dispute> {
-    fn resolve(&self, account: &mut Account) -> Result<Transaction<Resolve>> {
-        account.resolve(self.amount)?;
-        Ok(Transaction {
-            client_id: self.client_id,
-            tx_id: self.tx_id,
-            amount: self.amount,
-            _state: PhantomData,
-        })
-    }
-}
-
-impl ChargebackTransaction for Transaction<Dispute> {
-    fn chargeback(&self, account: &mut Account) -> Result<Transaction<Chargeback>> {
-        account.chargeback(self.amount)?;
-        Ok(Transaction {
-            client_id: self.client_id,
-            tx_id: self.tx_id,
-            amount: self.amount,
-            _state: PhantomData,
-        })
-    }
-}
-
-pub struct Transaction<State> {
-    pub client_id: u16,
-    pub tx_id: u32,
-    pub amount: f64,
+pub struct TransactionState<State> {
     _state: PhantomData<State>,
 }
 
-// Common transaction methods will go here
-impl<State> Transaction<State> {}
+impl TransactionState<Deposit> {
+    pub fn new_deposit() -> Self {
+        Self {
+            _state: PhantomData,
+        }
+    }
 
-// Only withdrawal and deposit transactions can be newly created
-impl Transaction<Withdrawal> {
-    pub fn new_withdrawal(
-        client_id: u16,
-        tx_id: u32,
-        amount: f64,
-        account: &mut Account,
-    ) -> Result<Transaction<Withdrawal>> {
-        account.withdraw(amount)?;
-        Ok(Self {
-            client_id,
-            tx_id,
-            amount,
+    pub fn dispute(&self, amount: f64, account: &mut Account) -> Result<TransactionState<Dispute>> {
+        account.hold(amount)?;
+        Ok(TransactionState {
             _state: PhantomData,
         })
     }
 }
 
-impl Transaction<Deposit> {
-    pub fn new_deposit(
-        client_id: u16,
-        tx_id: u32,
+impl TransactionState<Dispute> {
+    pub fn resolve(&self, amount: f64, account: &mut Account) -> Result<TransactionState<Resolve>> {
+        account.resolve(amount)?;
+        Ok(TransactionState {
+            _state: PhantomData,
+        })
+    }
+
+    pub fn chargeback(
+        &self,
         amount: f64,
         account: &mut Account,
-    ) -> Result<Transaction<Deposit>> {
+    ) -> Result<TransactionState<Chargeback>> {
+        account.chargeback(amount)?;
+        Ok(TransactionState {
+            _state: PhantomData,
+        })
+    }
+}
+
+impl TransactionState<Withdrawal> {
+    pub fn new_withdrawal() -> Self {
+        Self {
+            _state: PhantomData,
+        }
+    }
+}
+
+pub struct Transaction {
+    pub client_id: u16,
+    pub amount: f64,
+    pub state: TransactionType,
+}
+
+// Only withdrawal and deposit transactions can be newly created
+impl Transaction {
+    pub fn new_withdrawal(
+        client_id: u16,
+        amount: f64,
+        account: &mut Account,
+    ) -> Result<Transaction> {
+        account.withdraw(amount)?;
+        Ok(Self {
+            client_id,
+            amount,
+            state: TransactionType::Withdrawal(TransactionState::new_withdrawal()),
+        })
+    }
+    pub fn new_deposit(client_id: u16, amount: f64, account: &mut Account) -> Result<Transaction> {
         account.deposit(amount)?;
         Ok(Self {
             client_id,
-            tx_id,
             amount,
-            _state: PhantomData,
+            state: TransactionType::Deposit(TransactionState::new_deposit()),
         })
     }
 }

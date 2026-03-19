@@ -29,7 +29,7 @@ That was mostly done to test large quantities with properly generated client_id 
 This generator is a very crude development and I am not including it here, but it helped me verify I can run a CSV with 100,000 rows and 20,000 clients of prod-like CSV data to very roughly assess how my single-threaded program handles performance. 
 It was the fastest way to test bulk data processing. 
 
-Also I used Claude for small routine subtasks at the beginning of this effort, like CSV parsing, but then simplified and changed it anyway.  There might be some AI-looking comments still around.  For program logic I didn't use AI at all because I wanted to use **Rust type state** pattern and it was just easier and more fun to do it myself.  I did a decent job keeping it well organized, small, and readable, but suspect that my approach to transaction state transitions could be further simplified.
+Also I used Claude for small routine subtasks at the beginning of this effort, like CSV parsing, but then simplified and changed it anyway.  There might be some AI-looking comments still around.  For program logic I didn't use AI at all because I wanted to use **Rust type state** pattern and it was just easier and more fun to do it myself.
 
 NOTE: This processor is single-threaded for simplicity. 
 
