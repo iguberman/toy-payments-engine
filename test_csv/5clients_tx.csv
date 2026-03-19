@@ -27,7 +27,7 @@ deposit, 3, 11, 11.1111
 dispute, 3, 10
 dispute, 3, 11
 resolve, 3, 10
-chargeback, 3, 11
+resolve, 3, 11
 deposit, 4, 110, 10.1111
 deposit, 4, 111, 11.1111
 dispute, 4, 111
@@ -42,7 +42,7 @@ dispute, 5, 101
 dispute, 5, 104
 resolve, 5, 101
 chargeback, 5, 104
-dispute, 5, 102
+dispute, 3, 102
 
 
 
